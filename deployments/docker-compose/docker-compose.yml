@@ -1,0 +1,17 @@
+version: '3.7'
+
+services: 
+  gateway:
+    build:
+      context: ../..
+      dockerfile: build/package/gateway/Dockerfile
+    image: qultist/ql-gateway:0.1
+    ports: 
+      - '8080:8080'
+  grpc-service:
+    build:
+      context: ../..
+      dockerfile: build/package/grpc-service/Dockerfile
+    image: qultist/ql-grpc-service:0.1
+  redis:
+    image: redis:5.0-alpine
