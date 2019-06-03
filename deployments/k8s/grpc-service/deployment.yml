@@ -13,4 +13,7 @@ spec:
     spec:
       containers:
       - name: grpc-service
-        image: qultist/ql-grpc-service:0.1
+        image: qultist/ql-gateway
+        resources:
+          limits:
+            cpu: "25m"

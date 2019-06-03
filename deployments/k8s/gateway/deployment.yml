@@ -13,4 +13,7 @@ spec:
     spec:
       containers:
       - name: gateway
-        image: qultist/ql-gateway:0.1
+        image: qultist/ql-gateway
+        resources:
+          limits:
+            cpu: "25m"
