@@ -1,0 +1,13 @@
+apiVersion: skaffold/v1beta11
+kind: Config
+build:
+  artifacts:
+  - image: qultist/ql-grpc-service
+    context: .
+    docker:
+      dockerfile: build/package/grpc-service/Dockerfile
+deploy:
+  kubectl:
+    manifests:
+    - deployments/k8s/grpc-service/deployment.yml
+    - deployments/k8s/grpc-service/service.yml

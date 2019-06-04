@@ -1,0 +1,13 @@
+apiVersion: skaffold/v1beta11
+kind: Config
+build:
+  artifacts:
+  - image: qultist/ql-gateway
+    context: .
+    docker:
+      dockerfile: build/package/gateway/Dockerfile
+deploy:
+  kubectl:
+    manifests:
+    - deployments/k8s/gateway/deployment.yml
+    - deployments/k8s/gateway/service.yml
