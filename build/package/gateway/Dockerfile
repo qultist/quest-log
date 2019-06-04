@@ -4,7 +4,8 @@ WORKDIR /go/src/github.com/qultist/quest-log
 RUN apk add --no-cache git
 COPY go.mod go.sum ./
 RUN go mod download
-COPY . .
+COPY cmd/gateway ./cmd/gateway
+COPY internal ./internal
 RUN go build -o /go/bin/gateway cmd/gateway/main.go
 
 FROM alpine:latest
