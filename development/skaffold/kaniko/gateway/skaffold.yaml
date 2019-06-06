@@ -1,0 +1,20 @@
+apiVersion: skaffold/v1beta11
+kind: Config
+build:
+  artifacts:
+  - image: qultist/ql-gateway
+    context: .
+    kaniko:
+      dockerfile: build/package/gateway/Dockerfile
+      buildContext:
+        localDir: {}
+      cache:
+        repo: qultist/ql-gateway-cache
+  cluster:
+    dockerConfig:
+      secretName: docker-config
+deploy:
+  kubectl:
+    manifests:
+    - deployments/k8s/gateway/deployment.yml
+    - deployments/k8s/gateway/service.yml
