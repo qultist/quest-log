@@ -4,16 +4,16 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc"
 	"log"
 	"net/http"
+	"quest-log/internal/app/gateway"
 	"strconv"
 	"time"
 
 	"github.com/gorilla/mux"
 
 	pb "quest-log/internal/pkg/protos"
-
-	"google.golang.org/grpc"
 )
 
 const (
@@ -95,6 +95,9 @@ func main() {
 	router.HandleFunc("/grpc/quests", grpcCreate).Methods("POST")
 	router.HandleFunc("/grpc/quests", grpcList).Methods("GET")
 	router.HandleFunc("/grpc/quests/{id:[0-9]+}", grpcDelete).Methods("DELETE")
+	router.HandleFunc("/http/quests", gateway.HttpCreate).Methods("POST")
+	router.HandleFunc("/http/quests", gateway.HttpGetAll).Methods("GET")
+	router.HandleFunc("/http/quests/{id:[0-9]+}", gateway.HttpDelete).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
