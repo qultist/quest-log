@@ -12,7 +12,7 @@ const (
 )
 
 func HttpCreate(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Post(httpSvcAddress+"/quests", "application/json", nil)
+	resp, err := http.Post(httpSvcAddress+"/quests", "application/json", r.Body)
 	if err != nil {
 		handleUnreachable(err, w)
 	}
