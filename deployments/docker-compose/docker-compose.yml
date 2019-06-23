@@ -24,10 +24,10 @@ services:
     depends_on:
       - redis
       - zookeeper
-  http-service:
-    image: qultist/ql-http-service:0.1
-    ports:
-      - '8081:8080'
+#  http-service:
+#    image: qultist/ql-http-service:0.1
+#    ports:
+#      - '8081:8080'
   redis:
     image: redis:5.0-alpine
     ports:

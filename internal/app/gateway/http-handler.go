@@ -15,6 +15,7 @@ func HttpCreate(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Post(httpSvcAddress+"/quests", "application/json", r.Body)
 	if err != nil {
 		handleUnreachable(err, w)
+		return
 	}
 
 	defer resp.Body.Close()
@@ -27,6 +28,7 @@ func HttpGetAll(w http.ResponseWriter, r *http.Request) {
 	resp, err := http.Get(httpSvcAddress + "/quests")
 	if err != nil {
 		handleUnreachable(err, w)
+		return
 	}
 
 	defer resp.Body.Close()
@@ -42,12 +44,13 @@ func HttpDelete(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{}
 	req, err := http.NewRequest("DELETE", httpSvcAddress+"/quests/"+vars["id"], nil)
 	if err != nil {
-		panic(err)
+		log.Print("HTTP handler: Creating DELETE request failed.")
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
 		handleUnreachable(err, w)
+		return
 	}
 
 	defer resp.Body.Close()
@@ -59,5 +62,4 @@ func HttpDelete(w http.ResponseWriter, r *http.Request) {
 func handleUnreachable(err error, w http.ResponseWriter) {
 	log.Printf("Unreachable: %v", err)
 	http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-	return
 }
