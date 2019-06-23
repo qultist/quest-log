@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc"
 	"log"
 	"net"
-	"quest-log/internal/pkg/repository"
-
 	pb "quest-log/internal/pkg/protos"
-
-	"google.golang.org/grpc"
+	"quest-log/internal/pkg/repository"
 )
 
 const (
@@ -20,7 +18,6 @@ const (
 var repo repository.Repository
 
 type server struct{}
-
 
 func (s *server) ListQuests(context.Context, *empty.Empty) (*pb.QuestList, error) {
 	quests := repo.FetchQuests()
@@ -44,7 +41,7 @@ func (s *server) DeleteQuest(ctx context.Context, quest *pb.Quest) (*pb.Status, 
 
 func main() {
 	repo = repository.NewRepository()
-	defer repo.CloseConnection()
+	defer repo.Close()
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)

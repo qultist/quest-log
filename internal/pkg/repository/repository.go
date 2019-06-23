@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	pb "quest-log/internal/pkg/protos"
+	"time"
 )
 
 const (
@@ -15,15 +16,15 @@ type Repository interface {
 	StoreQuest(quest *pb.Quest)
 	FetchQuests() []*pb.Quest
 	DeleteQuest(id int64) bool
-	CloseConnection()
+	Close()
 }
 
 type repository struct {
-	conn redis.Conn
+	pool *redis.Pool
 }
 
 func (repo repository) StoreQuest(quest *pb.Quest) {
-	id, err := redis.Int64(repo.conn.Do("INCR", "id:quests"))
+	id, err := redis.Int64(repo.pool.Get().Do("INCR", "id:quests"))
 	if err != nil {
 		panic(err)
 	}
@@ -35,19 +36,19 @@ func (repo repository) StoreQuest(quest *pb.Quest) {
 		panic(err)
 	}
 
-	_, err = repo.conn.Do("SET", fmt.Sprintf("quest:%d", id), string(b))
+	_, err = repo.pool.Get().Do("SET", fmt.Sprintf("quest:%d", id), string(b))
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = repo.conn.Do("SADD", "quests", id)
+	_, err = repo.pool.Get().Do("SADD", "quests", id)
 	if err != nil {
 		panic(err)
 	}
 }
 
 func (repo repository) FetchQuests() []*pb.Quest {
-	ids, err := redis.Int64s(repo.conn.Do("SMEMBERS", "quests"))
+	ids, err := redis.Int64s(repo.pool.Get().Do("SMEMBERS", "quests"))
 	if err != nil {
 		panic(err)
 	}
@@ -55,7 +56,7 @@ func (repo repository) FetchQuests() []*pb.Quest {
 	var quests []*pb.Quest
 
 	for _, id := range ids {
-		questJson, err := redis.String(repo.conn.Do("GET", fmt.Sprintf("quest:%d", id)))
+		questJson, err := redis.String(repo.pool.Get().Do("GET", fmt.Sprintf("quest:%d", id)))
 		if err != nil {
 			panic(err)
 		}
@@ -73,12 +74,12 @@ func (repo repository) FetchQuests() []*pb.Quest {
 }
 
 func (repo repository) DeleteQuest(id int64) bool {
-	deleted, err := redis.Int64(repo.conn.Do("DEL", fmt.Sprintf("quest:%d", id)))
+	deleted, err := redis.Int64(repo.pool.Get().Do("DEL", fmt.Sprintf("quest:%d", id)))
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = repo.conn.Do("SREM", "quests",id)
+	_, err = repo.pool.Get().Do("SREM", "quests", id)
 	if err != nil {
 		panic(err)
 	}
@@ -86,19 +87,18 @@ func (repo repository) DeleteQuest(id int64) bool {
 	return deleted == 1
 }
 
-func (repo repository) CloseConnection() {
-	repo.conn.Close()
+func (repo repository) Close() {
+	_ = repo.pool.Close()
 }
 
 func NewRepository() Repository {
 	repo := repository{}
 
-	c, err := redis.Dial("tcp", redisAddress)
-	if err != nil {
-		panic(err)
+	repo.pool = &redis.Pool{
+		MaxIdle:     3,
+		IdleTimeout: 240 * time.Second,
+		Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", redisAddress) },
 	}
-
-	repo.conn = c
 
 	return repo
 }
