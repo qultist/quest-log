@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-
 	pb "quest-log/internal/pkg/protos"
 )
 
@@ -21,6 +20,7 @@ const (
 )
 
 var grpcServiceClient pb.QuestServiceClient
+var kafkaHandler gateway.KafkaHandler
 
 func hello(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello World!\n"))
@@ -89,6 +89,10 @@ func main() {
 	defer conn.Close()
 	grpcServiceClient = pb.NewQuestServiceClient(conn)
 
+	// Kafka handler
+	kafkaHandler = gateway.NewKafkaHandler()
+	defer kafkaHandler.Close()
+
 	// Router
 	router := mux.NewRouter()
 	router.HandleFunc("/", hello)
@@ -98,6 +102,8 @@ func main() {
 	router.HandleFunc("/http/quests", gateway.HttpCreate).Methods("POST")
 	router.HandleFunc("/http/quests", gateway.HttpGetAll).Methods("GET")
 	router.HandleFunc("/http/quests/{id:[0-9]+}", gateway.HttpDelete).Methods("DELETE")
+	router.HandleFunc("/kafka/quests", kafkaHandler.Create).Methods("POST")
+	router.HandleFunc("/kafka/quests/{id:[0-9]+}", kafkaHandler.Delete).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
