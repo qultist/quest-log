@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-service
+spec:
+  selector:
+    matchLabels:
+      app: kafka-service
+  template:
+    metadata:
+      labels:
+        app: kafka-service
+    spec:
+      containers:
+      - name: kafka-service
+        image: qultist/ql-kafka-service
+        resources:
+          limits:
+            cpu: "25m"

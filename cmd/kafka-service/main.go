@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	kafkaAddress = "kafka:9092"
+	kafkaAddress = "ql-kafka-bootstrap:9092"
 	kafkaTopic   = "quests"
 )
 
@@ -23,6 +23,7 @@ func main() {
 		Brokers: []string{kafkaAddress},
 		Topic:   kafkaTopic,
 	})
+	_ = r.SetOffset(kafka.LastOffset)
 
 	for {
 		m, err := r.ReadMessage(context.Background())

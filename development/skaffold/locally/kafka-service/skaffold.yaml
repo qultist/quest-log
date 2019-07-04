@@ -1,0 +1,12 @@
+apiVersion: skaffold/v1beta11
+kind: Config
+build:
+  artifacts:
+    - image: qultist/ql-kafka-service
+      context: .
+      docker:
+        dockerfile: build/package/kafka-service/Dockerfile
+deploy:
+  kubectl:
+    manifests:
+      - deployments/k8s/kafka-service/deployment.yml

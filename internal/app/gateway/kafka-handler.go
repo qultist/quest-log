@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	kafkaAddress = "kafka:9092"
+	kafkaAddress = "ql-kafka-bootstrap:9092"
 	kafkaTopic   = "quests"
 )
 
