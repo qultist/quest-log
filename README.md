@@ -3,6 +3,11 @@ Simple *distributed* app built and packaged with Docker to be deployed on Kubern
 bachelor's thesis. The project is intended to test tools like Skaffold and Telepresence in interaction with different
 communication mechanisms between the services.
 
+The app consists of three services which all do the same but are differently integrated. The HTTP service can be
+found [here](https://github.com/qultist/quest-log-http).
+
+![questlog](assets/questlog.png)
+
 ## Requirements
 | Development          | Deployment           | Additional services |
 |----------------------|----------------------|---------------------|
